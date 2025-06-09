@@ -1,22 +1,23 @@
 package main
 
 import (
-	"fmt"
 	"github.com/arishimam/gator/internal/config"
 )
 
 type state struct {
-	cfg *Config
+	cfg *config.Config
 }
 
 func main() {
-	cfg, err := config.Read()
+	s := state{}
+	config, err := config.Read()
+	s.cfg = &config
+
+	cmds := commands{make(map[string]func(*state, command) error)}
+	cmds.register("login", handlerLogin)
+
 	if err != nil {
 		return
 	}
 
-	fmt.Println(cfg)
-	cfg.SetUser("arish")
-	cfg, _ = config.Read()
-	fmt.Println(cfg)
 }

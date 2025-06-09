@@ -1,13 +1,12 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 )
 
 func handlerLogin(s *state, cmd command) error {
 	if len(cmd.args) == 0 {
-		return errors.New("argument slice is empty")
+		return fmt.Errorf("argument slice is empty")
 	}
 
 	user := cmd.args[0]

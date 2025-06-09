@@ -10,9 +10,9 @@ type commands struct {
 }
 
 func (c *commands) run(s *state, cmd command) error {
-	return nil
+	return c.commandMap[cmd.name](s, cmd)
 }
 
 func (c *commands) register(name string, f func(*state, command) error) {
-
+	c.commandMap[name] = f
 }
