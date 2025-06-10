@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"os"
-
 	"github.com/arishimam/gator/internal/config"
+	"log"
+	"os"
 )
 
 type state struct {
@@ -12,28 +12,29 @@ type state struct {
 }
 
 func main() {
-	s := state{}
 	config, err := config.Read()
-	s.cfg = &config
+	if err != nil {
+		log.Fatalf("error reading config: %v", err)
+	}
+
+	programState := &state{
+		cfg: &config,
+	}
 
 	cmds := commands{make(map[string]func(*state, command) error)}
 	cmds.register("login", handlerLogin)
-
-	if err != nil {
-		return
-	}
 
 	if len(os.Args) < 2 {
 		fmt.Println("No command-line arguments passed in")
 		os.Exit(1)
 	}
-	args := os.Args[1:]
-	if len(args) == 1 {
-		fmt.Println("username is required")
-		os.Exit(1)
-	}
 
-	username := args[1]
-	s.cfg.SetUser(username)
+	cmdName := os.Args[1]
+	cmdArgs := os.Args[2:]
+
+	err = cmds.run(programState, command{cmdName, cmdArgs})
+	if err != nil {
+		log.Fatal(err)
+	}
 
 }

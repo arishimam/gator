@@ -16,15 +16,8 @@ type Config struct {
 }
 
 func (c *Config) SetUser(userName string) error {
-	config, err := Read()
-	config.CurrentUserName = userName
-
-	write(config)
-
-	if err != nil {
-		return err
-	}
-	return nil
+	c.CurrentUserName = userName
+	return write(*c)
 }
 
 func write(cfg Config) error {

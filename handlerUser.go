@@ -10,11 +10,12 @@ func handlerLogin(s *state, cmd command) error {
 	}
 
 	user := cmd.args[0]
+
 	err := s.cfg.SetUser(user)
 	if err != nil {
-		return err
+		return fmt.Errorf("Couldn't set current user")
 	}
-	fmt.Println("user has been set to ", user)
 
+	fmt.Println("user has been set to ", user)
 	return nil
 }
