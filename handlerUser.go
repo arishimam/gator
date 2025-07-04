@@ -16,7 +16,15 @@ func handlerLogin(s *state, cmd command) error {
 
 	user := cmd.args[0]
 
-	err := s.cfg.SetUser(user)
+	i, err := s.db.GetUser(context.Background(), user)
+	if err != nil {
+		return fmt.Errorf("user does not exist in db")
+	}
+
+	fmt.Println(i)
+	fmt.Println(err)
+
+	err = s.cfg.SetUser(user)
 	if err != nil {
 		return fmt.Errorf("Couldn't set current user")
 	}
@@ -34,6 +42,7 @@ func handlerRegister(s *state, cmd command) error {
 	}
 
 	userName := cmd.args[0]
+	fmt.Println(userName)
 
 	userParams := database.CreateUserParams{
 		ID:        uuid.New(),
