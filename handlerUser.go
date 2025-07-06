@@ -15,10 +15,12 @@ func handlerLogin(s *state, cmd command) error {
 	}
 
 	user := cmd.args[0]
+	fmt.Println("trying to login:")
+	fmt.Println(user)
 
 	i, err := s.db.GetUser(context.Background(), user)
 	if err != nil {
-		return fmt.Errorf("user does not exist in db")
+		return fmt.Errorf("failed to get user from db: %w", err)
 	}
 
 	fmt.Println(i)
