@@ -39,6 +39,8 @@ func main() {
 	cmds := commands{make(map[string]func(*state, command) error)}
 	cmds.register("login", handlerLogin)
 	cmds.register("register", handlerRegister)
+	cmds.register("reset", handlerReset)
+	cmds.register("users", handlerGetUsers)
 
 	if len(os.Args) < 2 {
 		fmt.Println("No command-line arguments passed in")
