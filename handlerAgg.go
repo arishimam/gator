@@ -11,9 +11,8 @@ func handlerAgg(s *state, cmd command) error {
 		return err
 	}
 
-	fmt.Printf("User: %+v\n", *feed)
+	fmt.Printf("feed: %+v\n", *feed)
 
 	return nil
 
 }
-
