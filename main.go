@@ -43,6 +43,7 @@ func main() {
 	cmds.register("users", handlerGetUsers)
 	cmds.register("agg", handlerAgg)
 	cmds.register("addfeed", handlerAddFeed)
+	cmds.register("feeds", handlerPrintFeeds)
 
 	if len(os.Args) < 2 {
 		fmt.Println("No command-line arguments passed in")
