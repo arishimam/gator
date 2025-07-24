@@ -8,9 +8,9 @@ import (
 	"time"
 )
 
-func handlerAddFeed(s *state, cmd command) error {
-	userName := s.cfg.CurrentUserName
-	fmt.Println(userName)
+func handlerAddFeed(s *state, cmd command, user database.User) error {
+	// userName := s.cfg.CurrentUserName
+	// fmt.Println(userName)
 
 	if len(cmd.args) < 2 {
 		return fmt.Errorf("Not enough args")
@@ -24,10 +24,12 @@ func handlerAddFeed(s *state, cmd command) error {
 		return err
 	}
 
-	user, err := s.db.GetUser(context.Background(), userName)
-	if err != nil {
-		return err
-	}
+	/*
+		user, err := s.db.GetUser(context.Background(), userName)
+		if err != nil {
+			return err
+		}
+	*/
 
 	feedParams := database.CreateFeedParams{
 		ID:        uuid.New(),

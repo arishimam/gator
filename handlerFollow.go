@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func handlerFollow(s *state, cmd command) error {
+func handlerFollow(s *state, cmd command, user database.User) error {
 	if len(cmd.args) != 1 {
 		return fmt.Errorf("Incorrect number of arguments!")
 	}
@@ -17,11 +17,6 @@ func handlerFollow(s *state, cmd command) error {
 	url := cmd.args[0]
 
 	feed, err := s.db.GetFeedWithUrl(context.Background(), url)
-	if err != nil {
-		return err
-	}
-
-	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
 	if err != nil {
 		return err
 	}
@@ -44,17 +39,32 @@ func handlerFollow(s *state, cmd command) error {
 
 	return nil
 }
+func handlerUnfollow(s *state, cmd command, user database.User) error {
+	if len(cmd.args) != 1 {
+		fmt.Errorf("This command only takes 1 argument")
+	}
 
-func handlerFollowing(s *state, cmd command) error {
+	url := cmd.args[0]
+	feed, err := s.db.GetFeedWithUrl(context.Background(), url)
+	if err != nil {
+		return err
+	}
+
+	err = s.db.DeleteFeedFollow(context.Background(), database.DeleteFeedFollowParams{UserID: user.ID, FeedID: feed.ID})
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
+func handlerFollowing(s *state, cmd command, user database.User) error {
 	if len(cmd.args) != 0 {
 		return fmt.Errorf("No arguments allowed for this command!")
 	}
 
 	username := s.cfg.CurrentUserName
-	user, err := s.db.GetUser(context.Background(), username)
-	if err != nil {
-		return err
-	}
 
 	feedFollows, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
 	if err != nil {
