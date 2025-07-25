@@ -19,16 +19,16 @@ func handlerAddFeed(s *state, cmd command, user database.User) error {
 	url := cmd.args[1]
 	fmt.Println(feedName, url)
 
-	feed, err := fetchFeed(context.Background(), url)
-	if err != nil {
-		return err
-	}
-
 	/*
-		user, err := s.db.GetUser(context.Background(), userName)
+		_, err := fetchFeed(context.Background(), url)
 		if err != nil {
 			return err
 		}
+
+			user, err := s.db.GetUser(context.Background(), userName)
+			if err != nil {
+				return err
+			}
 	*/
 
 	feedParams := database.CreateFeedParams{
@@ -58,7 +58,7 @@ func handlerAddFeed(s *state, cmd command, user database.User) error {
 		return err
 	}
 
-	fmt.Printf("feed: %+v\n", *feed)
+	// fmt.Printf("feed: %+v\n", *feed)
 
 	return nil
 
