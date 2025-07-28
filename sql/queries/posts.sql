@@ -20,3 +20,11 @@ VALUES (
     $8
 )
 RETURNING *;
+
+-- name: GetPostsForUser :many
+SELECT posts.*
+FROM posts 
+JOIN feeds on posts.feed_id = feeds.id
+WHERE feeds.user_id = $1
+ORDER BY posts.published_at DESC
+LIMIT $2;
