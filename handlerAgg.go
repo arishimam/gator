@@ -2,7 +2,10 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
+	"github.com/arishimam/gator/internal/database"
+	"github.com/google/uuid"
 	"time"
 )
 
@@ -37,7 +40,32 @@ func scrapeFeeds(s *state) error {
 	s.db.MarkFeedFetched(context.Background(), feed.ID)
 	updatedFeed, err := s.db.GetFeedWithUrl(context.Background(), feed.Url)
 
-	fmt.Println("Just updated ")
+	fetchedFeed, err := fetchFeed(context.Background(), feed.Url)
+	if err != nil {
+		fmt.Errorf("Error occurred when fetching feed: %v\n", err)
+	}
+
+	fmt.Println("UPDATED:")
+	fmt.Println(fetchedFeed)
+
+	/*
+		parsedPubDate, err := time.Parse(
+
+
+		postParams := database.CreatePostParams{
+			ID:          uuid.New(),
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+			Title:       fetchedFeed.Channel.Title,
+			Url:         feed.Url,
+			Description: sql.NullString{
+				String: fetchedFeed.Channel.Description,
+				Valid: fetchedFeed.Channel.Description != ""},
+			PublishedAt:
+		}
+	*/
+
+	s.db.CreatePost(context.Background(), postParams)
 
 	fmt.Println("Feed: ", updatedFeed.Name)
 	// fmt.Println("Article: \n", updatedFeed.)
