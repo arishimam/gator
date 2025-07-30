@@ -32,44 +32,74 @@ func handlerAgg(s *state, cmd command) error {
 }
 
 func scrapeFeeds(s *state) error {
+	ctx := context.Background()
+
 	feed, err := s.db.GetNextFeedToFetch(context.Background())
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get next feed: %w\n", err)
 	}
 
-	s.db.MarkFeedFetched(context.Background(), feed.ID)
-	updatedFeed, err := s.db.GetFeedWithUrl(context.Background(), feed.Url)
+	if err := s.db.MarkFeedFetched(ctx, feed.ID); err != nil {
+		return fmt.Errorf("failed to mark feed fetched: %w\n", err)
+	}
 
-	fetchedFeed, err := fetchFeed(context.Background(), feed.Url)
+	// updatedFeed, err := s.db.GetFeedWithUrl(ctx, feed.Url)
+
+	fetchedFeed, err := fetchFeed(ctx, feed.Url)
 	if err != nil {
-		fmt.Errorf("Error occurred when fetching feed: %v\n", err)
+		return fmt.Errorf("error occurred when fetching feed: %w\n", err)
 	}
 
-	fmt.Println("UPDATED:")
-	fmt.Println(fetchedFeed)
+	//fmt.Println("UPDATED:")
+	//fmt.Println(fetchedFeed)
 
-	/*
-		parsedPubDate, err := time.Parse(
-
+	for _, item := range fetchedFeed.Channel.Item {
+		pubDate, err := parsePubDate(item.PubDate)
+		if err != nil {
+			fmt.Printf("Skipping item due to bad pubDate: %q (%v)\n", item.PubDate, err)
+			continue
+		}
 
 		postParams := database.CreatePostParams{
-			ID:          uuid.New(),
-			CreatedAt:   time.Now(),
-			UpdatedAt:   time.Now(),
-			Title:       fetchedFeed.Channel.Title,
-			Url:         feed.Url,
+			ID:        uuid.New(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Title:     fetchedFeed.Channel.Title,
+			Url:       feed.Url,
 			Description: sql.NullString{
 				String: fetchedFeed.Channel.Description,
-				Valid: fetchedFeed.Channel.Description != ""},
-			PublishedAt:
+				Valid:  fetchedFeed.Channel.Description != ""},
+			PublishedAt: pubDate,
+			FeedID:      feed.ID,
 		}
-	*/
 
-	s.db.CreatePost(context.Background(), postParams)
+		_, err = s.db.CreatePost(ctx, postParams)
+		if err != nil {
+			fmt.Printf("Duplicated or failed insert for URL %s: %v\n", item.Link, err)
+		}
+	}
 
-	fmt.Println("Feed: ", updatedFeed.Name)
-	// fmt.Println("Article: \n", updatedFeed.)
+	fmt.Println("Scrape complete")
 
 	return nil
 
+}
+
+func parsePubDate(s string) (time.Time, error) {
+	formats := []string{
+		time.RFC1123,
+		time.RFC1123Z,
+		time.RFC822Z,
+		time.RFC822,
+		time.RFC3339,
+		time.RFC850,
+	}
+
+	for _, f := range formats {
+		if t, err := time.Parse(f, s); err == nil {
+			return t, nil
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("unrecognized publish date format: %s\n", s)
 }
