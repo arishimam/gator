@@ -1,11 +1,15 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"strconv"
+
+	"github.com/arishimam/gator/internal/database"
 )
 
-func handlerBrowse(s *state, cmd command) error {
+func handlerBrowse(s *state, cmd command, user database.User) error {
+	ctx := context.Background()
 
 	limit := 2
 
@@ -16,7 +20,22 @@ func handlerBrowse(s *state, cmd command) error {
 		}
 		limit = tmp
 	}
-	fmt.Println(limit)
+
+	getPostsParams := database.GetPostsForUserParams{
+		UserID: user.ID,
+		Limit:  int32(limit),
+	}
+
+	posts, err := s.db.GetPostsForUser(ctx, getPostsParams)
+	if err != nil {
+		return fmt.Errorf("error getting posts: %w\n", err)
+	}
+	for _, p := range posts {
+		fmt.Println(p.Title)
+		fmt.Println(p.Description)
+		fmt.Println(p.Url)
+		fmt.Println()
+	}
 
 	return nil
 
