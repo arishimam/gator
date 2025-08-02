@@ -12,7 +12,30 @@ Before you begin, make sure you have the following installed:
 - PostgreSQL (v15+ recommended)
     - *[Install PostgreSQL](https://www.postgresql.org/download/)*
 
-TODO: explain how to setup the config file then run the program
+
+## Setup
+1. Clone the repository.
+`git clone ...`
+
+2. Create a PostgreSQL database. Connect to 'psql' and run:
+`CREATE DATABASE gator;`
+
+3. Create a '.gatorconfig.config file in your home directory. 
+`~/.gatorconfig.json`
+
+Get your connection string. This is just a URL with the information needed to connect to a database. The format is: 
+`protocol://username:password@host:port/database`
+Here are examples:
+- macOS: `postgres:arish:@localhost:5432/gator`
+- Linux: `postgres:postgres@localhost:5432/gator`
+
+Edit the config file and add the connection string followed by 'sslmode=disable'
+`{
+    "db_url": "postgres://rish@localhost:5432/gator?sslmode=disable"
+}`
+
+
+TODO: explain how to run the program
 
 TODO: List common commands with examples
 
