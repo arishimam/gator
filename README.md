@@ -18,21 +18,40 @@ Before you begin, make sure you have the following installed:
 `git clone ...`
 
 2. Create a PostgreSQL database. Connect to 'psql' and run:
+
 `CREATE DATABASE gator;`
 
 3. Create a '.gatorconfig.config file in your home directory. 
+
 `~/.gatorconfig.json`
 
 Get your connection string. This is just a URL with the information needed to connect to a database. The format is: 
+
 `protocol://username:password@host:port/database`
-Here are examples:
+
+Examples:
 - macOS: `postgres:arish:@localhost:5432/gator`
 - Linux: `postgres:postgres@localhost:5432/gator`
 
-Edit the config file and add the connection string followed by 'sslmode=disable'
+Edit the config file and add the connection string with ssl mode disabled. We need this to use the connection string with `goose`.
+
 `{
-    "db_url": "postgres://rish@localhost:5432/gator?sslmode=disable"
+    "db_url": "postgres://arish@localhost:5432/gator?sslmode=disable"
 }`
+
+4. Migrations
+
+Run database migrations using goose.
+
+`go install github.com/pressly/goose/v3/cmd/goose@latest`
+
+Navigate to the sql/schema directory and run:
+
+`goose postgres "db_connection_string" up`
+
+Example:
+
+`goose postgres postgres://arish:@localhost:5432/gator up`
 
 
 TODO: explain how to run the program
